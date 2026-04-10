@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>layout-rs — sheet preview (WASM)</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <h1>Print sheet layout</h1>
+        <p class="tagline">
+          Proportional counts per sheet, multi-stage guillotine (V–H / H–V). Optional 90° rotation per piece.
+        </p>
+        <p class="engine-note">Engine: Rust → WebAssembly (<code>solveLayoutJson</code>).</p>
+      </header>
+
+      <div class="layout">
+        <aside class="panel">
+          <section class="card">
+            <h2>Sheet</h2>
+            <div class="grid2">
+              <label>
+                Width Wp
+                <input type="number" id="sheetW" min="1" value="700" />
+              </label>
+              <label>
+                Height Hp
+                <input type="number" id="sheetH" min="1" value="600" />
+              </label>
+            </div>
+            <label class="kmax">
+              Max k (optional)
+              <input type="number" id="kMax" min="1" placeholder="default" />
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" id="allowRotation" checked />
+              <span>Default: allow 90° rotation (for products set to “Sheet default”)</span>
+            </label>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <h2>Products</h2>
+              <button type="button" id="addProduct" class="btn secondary">+ Add</button>
+            </div>
+            <div id="productList" class="product-list"></div>
+          </section>
+
+          <button type="button" id="compute" class="btn primary">Compute layout</button>
+          <p id="error" class="error" hidden></p>
+        </aside>
+
+        <main class="preview">
+          <section class="card stats-card" id="statsSection" hidden>
+            <h2>Result</h2>
+            <dl class="stats" id="stats"></dl>
+          </section>
+          <section class="card svg-card">
+            <h2>One sheet preview</h2>
+            <div id="svgHost" class="svg-host">
+              <p class="placeholder" id="placeholder">
+                Set sheet size and products, then click <strong>Compute layout</strong>.
+              </p>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+    <script type="module" src="/main.ts"></script>
+  </body>
+</html>
