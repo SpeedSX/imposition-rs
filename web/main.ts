@@ -244,13 +244,30 @@ async function main(): Promise<void> {
     statsSection.hidden = false;
 
     const perPage = products.map((p, i) => `${p.id}×${sol.countsPerPage[i]}`).join(", ");
+    const producedByType = products
+      .map((p, i) => {
+        const perSheet = sol.countsPerPage[i] ?? 0;
+        const produced = perSheet * sol.pages;
+        return `${p.id}: ${produced}`;
+      })
+      .join("; ");
+    const overByType = products
+      .map((p, i) => {
+        const perSheet = sol.countsPerPage[i] ?? 0;
+        const produced = perSheet * sol.pages;
+        const over = Math.max(0, produced - p.target);
+        return `${p.id}: +${over}`;
+      })
+      .join("; ");
     const kLabel = sol.k > 0 ? String(sol.k) : "— (mixed)";
 
     statsEl.innerHTML = `
     <dt>k (gcd scale)</dt><dd>${kLabel}</dd>
     <dt>Per sheet</dt><dd>${perPage}</dd>
     <dt>Press sheets P</dt><dd>${sol.pages}</dd>
+    <dt>Produced by type</dt><dd>${escapeHtml(producedByType)}</dd>
     <dt>Utilization</dt><dd>${(sol.utilization * 100).toFixed(2)}%</dd>
+    <dt>Overproduction by type</dt><dd>${escapeHtml(overByType)}</dd>
     <dt>Overproduction (total pcs)</dt><dd>+${sol.overproduction}</dd>
     <dt>Pack mode</dt><dd>${sol.pack.mode} (multi-stage)</dd>
     <dt>gcd d</dt><dd>${sol.pattern.d}</dd>
