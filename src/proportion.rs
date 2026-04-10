@@ -20,6 +20,7 @@ impl std::fmt::Display for ProportionError {
 impl std::error::Error for ProportionError {}
 
 /// Greatest common divisor of two non-negative integers (both zero => 0).
+#[must_use]
 pub fn gcd(a: i32, b: i32) -> i32 {
     let mut x = a.abs();
     let mut y = b.abs();
@@ -32,6 +33,7 @@ pub fn gcd(a: i32, b: i32) -> i32 {
 }
 
 /// GCD of a non-empty slice of non-negative integers.
+#[must_use]
 pub fn gcd_many(values: &[i32]) -> i32 {
     if values.is_empty() {
         return 0;
@@ -41,12 +43,15 @@ pub fn gcd_many(values: &[i32]) -> i32 {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProportionPattern {
-    /// d = gcd(T_1,…,T_n)
+    /// d = `gcd(T_1,…,T_n)`
     pub d: i32,
-    /// p_i = T_i / d
+    /// `p_i = T_i / d`
     pub p: Vec<i32>,
 }
 
+/// # Errors
+/// - `ProportionError::EmptyTargets` if targets is empty.
+/// - `ProportionError::InvalidTarget` if targets contains non-positive integers.
 pub fn compute_proportion_pattern(targets: &[i32]) -> Result<ProportionPattern, ProportionError> {
     if targets.is_empty() {
         return Err(ProportionError::EmptyTargets);
@@ -61,7 +66,9 @@ pub fn compute_proportion_pattern(targets: &[i32]) -> Result<ProportionPattern, 
     Ok(ProportionPattern { d, p })
 }
 
-/// Per-page counts c_i = k * p_i
+/// Per-page counts `c_i` = `k` * `p_i`
+/// # Errors
+/// - `ProportionError::InvalidK` if k < 1.
 pub fn counts_for_k(pattern: &ProportionPattern, k: i32) -> Result<Vec<i32>, ProportionError> {
     if k < 1 {
         return Err(ProportionError::InvalidK);
@@ -74,7 +81,9 @@ fn ceil_div_pos(numer: i32, denom: i32) -> i32 {
     (numer + denom - 1) / denom
 }
 
-/// P(k) = max_i ceil(T_i / (k * p_i))
+/// P(k) = `max_i` ceil(`T_i` / (`k` * `p_i`))
+/// # Errors
+/// - `ProportionError::InvalidK` if k < 1.
 pub fn pages_for_k(targets: &[i32], pattern: &ProportionPattern, k: i32) -> Result<i32, ProportionError> {
     let c = counts_for_k(pattern, k)?;
     let mut max_p = 0;
@@ -87,6 +96,7 @@ pub fn pages_for_k(targets: &[i32], pattern: &ProportionPattern, k: i32) -> Resu
     Ok(max_p)
 }
 
+#[must_use]
 pub fn total_overproduction(targets: &[i32], counts_per_page: &[i32], pages: i32) -> i32 {
     let mut sum = 0;
     for i in 0..targets.len() {
@@ -123,6 +133,7 @@ fn infer_gcd_k(counts: &[i32], pattern: &ProportionPattern) -> Option<i32> {
 }
 
 /// All distinct per-sheet count vectors to try (gcd-scaled primitive ratios plus ceil families).
+#[must_use]
 pub fn enumerate_count_plans(targets: &[i32], pattern: &ProportionPattern, k_max: i32) -> Vec<CountPlan> {
     use std::collections::HashMap;
 
@@ -138,7 +149,7 @@ pub fn enumerate_count_plans(targets: &[i32], pattern: &ProportionPattern, k_max
             .map(|(&t, &c)| ceil_div_pos(t, c))
             .max()
             .unwrap_or(0);
-        let key = counts.iter().map(|n| n.to_string()).collect::<Vec<_>>().join(",");
+        let key = counts.iter().map(std::string::ToString::to_string).collect::<Vec<_>>().join(",");
         let merged_gcd_k = match map.get(&key) {
             Some(prev) => gcd_k.or(prev.gcd_k),
             None => gcd_k,
@@ -170,6 +181,7 @@ pub fn enumerate_count_plans(targets: &[i32], pattern: &ProportionPattern, k_max
 }
 
 /// Upper bound on k from trivial area (optional coarse cap).
+#[must_use]
 pub fn suggest_k_max_area(
     pattern: &ProportionPattern,
     sheet_w: f64,
@@ -186,7 +198,7 @@ pub fn suggest_k_max_area(
         if a <= 0.0 {
             continue;
         }
-        let per_k = (pattern.p[i] as f64) * a;
+        let per_k = f64::from(pattern.p[i]) * a;
         if per_k <= 0.0 {
             continue;
         }

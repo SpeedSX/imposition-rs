@@ -90,6 +90,7 @@ fn no_overlaps(rects: &[PlacedRect]) -> bool {
 }
 
 /// V–H: columns tile [0,Wp]; within each column, rects share (x,w) and stack from y=0.
+#[must_use] 
 pub fn verify_two_stage_vh(rects: &[PlacedRect], wp: i32, hp: i32) -> bool {
     if rects.is_empty() {
         return true;
@@ -147,6 +148,7 @@ pub fn verify_two_stage_vh(rects: &[PlacedRect], wp: i32, hp: i32) -> bool {
 }
 
 /// H–V: rows tile [0,Hp]; within each row, rects share (y,h) and pack from x=0.
+#[must_use] 
 pub fn verify_two_stage_hv(rects: &[PlacedRect], wp: i32, hp: i32) -> bool {
     if rects.is_empty() {
         return true;
@@ -203,12 +205,14 @@ pub fn verify_two_stage_hv(rects: &[PlacedRect], wp: i32, hp: i32) -> bool {
     true
 }
 
+#[must_use]
 pub fn verify_two_stage(rects: &[PlacedRect], wp: i32, hp: i32) -> bool {
     verify_two_stage_vh(rects, wp, hp) || verify_two_stage_hv(rects, wp, hp)
 }
 
+#[must_use]
 pub fn total_placed_area(rects: &[PlacedRect]) -> i64 {
-    rects.iter().map(|r| (r.w as i64) * (r.h as i64)).sum()
+    rects.iter().map(|r| i64::from(r.w) * i64::from(r.h)).sum()
 }
 
 fn clone_placed(r: &PlacedRect) -> PlacedRect {
@@ -404,7 +408,7 @@ fn pack_vh_greedy(
             } else {
                 (item.w, item.h)
             };
-            for col in cols.iter_mut() {
+            for col in &mut cols {
                 if col.w != ow {
                     continue;
                 }
@@ -472,7 +476,7 @@ fn pack_hv_greedy(
             } else {
                 (item.w, item.h)
             };
-            for row in rows.iter_mut() {
+            for row in &mut rows {
                 if row.h != oh {
                     continue;
                 }
@@ -575,6 +579,7 @@ pub struct SkuRow {
 }
 
 /// Expand SKU rows into individual instances for packing.
+#[must_use]
 pub fn expand_instances(products: &[SkuRow]) -> Vec<PackInstance> {
     let mut out = Vec::new();
     for p in products {
@@ -621,11 +626,12 @@ impl Default for PackOptions<'_> {
 }
 
 /// Try 2-stage V–H / H–V with optional 90° rotation, multiple item orderings.
+#[must_use]
 pub fn pack_multi_stage(
     wp: i32,
     hp: i32,
     instances: &[PackInstance],
-    options: PackOptions<'_>,
+    options: &PackOptions<'_>,
 ) -> Vec<PackResult> {
     let max_sol = options.max_solutions;
     let seeds = if options.seeds.is_empty() {
@@ -634,7 +640,7 @@ pub fn pack_multi_stage(
         options.seeds
     };
     let default_allow_rotation = options.allow_rotation;
-    let sheet_area = (wp as f64) * (hp as f64);
+    let sheet_area = f64::from(wp) * f64::from(hp);
     let mut seen = std::collections::HashSet::<String>::new();
     let mut results: Vec<PackResult> = Vec::new();
 
@@ -660,22 +666,24 @@ pub fn pack_multi_stage(
         } else {
             pack_vh_greedy(&ordered, wp, hp, default_allow_rotation)
         };
-        if let Some(ref rects) = vh {
-            if all_inside_sheet(rects, wp, hp) && no_overlaps(rects) {
+
+        if let Some(ref rects) = vh 
+            && all_inside_sheet(rects, wp, hp) && no_overlaps(rects) {
                 try_push(rects.clone(), PackMode::Vh, &mut results, &mut seen);
             }
-        }
+
         let ordered2 = sort_instances(instances, seed);
         let hv = if use_dfs {
             pack_hv_dfs(&mut vec![], &ordered2, wp, hp, default_allow_rotation)
         } else {
             pack_hv_greedy(&ordered2, wp, hp, default_allow_rotation)
         };
-        if let Some(ref rects) = hv {
-            if all_inside_sheet(rects, wp, hp) && no_overlaps(rects) {
+
+        if let Some(ref rects) = hv 
+            && all_inside_sheet(rects, wp, hp) && no_overlaps(rects) {
                 try_push(rects.clone(), PackMode::Hv, &mut results, &mut seen);
             }
-        }
+
         if results.len() >= max_sol {
             return rank_pack_results(results);
         }
@@ -694,10 +702,11 @@ fn rank_pack_results(mut results: Vec<PackResult>) -> Vec<PackResult> {
 }
 
 /// Necessary condition: sum of areas fits.
+#[must_use]
 pub fn trivial_area_feasible(instances: &[PackInstance], wp: i32, hp: i32) -> bool {
     let sum: i64 = instances
         .iter()
-        .map(|i| (i.w as i64) * (i.h as i64))
+        .map(|i| i64::from(i.w) * i64::from(i.h))
         .sum();
-    sum <= (wp as i64) * (hp as i64)
+    sum <= i64::from(wp) * i64::from(hp)
 }

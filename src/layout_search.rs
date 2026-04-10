@@ -70,19 +70,20 @@ fn instances_from_counts(products: &[ProductSpec], counts: &[i32]) -> Vec<PackIn
 }
 
 /// Minimize press sheets P, then maximize utilization, then minimize overproduction.
+#[must_use]
 pub fn solve_layout(
     sheet_w: i32,
     sheet_h: i32,
     products: &[ProductSpec],
-    options: SolveOptions,
+    options: &SolveOptions,
 ) -> Option<LayoutSolution> {
     if products.is_empty() {
         return None;
     }
     let targets = targets_from_products(products);
     let pattern = compute_proportion_pattern(&targets).ok()?;
-    let dims: Vec<(f64, f64)> = products.iter().map(|p| (p.w as f64, p.h as f64)).collect();
-    let area_cap = suggest_k_max_area(&pattern, sheet_w as f64, sheet_h as f64, &dims);
+    let dims: Vec<(f64, f64)> = products.iter().map(|p| (f64::from(p.w), f64::from(p.h))).collect();
+    let area_cap = suggest_k_max_area(&pattern, f64::from(sheet_w), f64::from(sheet_h), &dims);
     let k_cap = options.k_max.unwrap_or(500);
     let k_max = k_cap.min(area_cap.max(1) + 100).clamp(1, 2000);
 
@@ -101,7 +102,7 @@ pub fn solve_layout(
             sheet_w,
             sheet_h,
             &instances,
-            PackOptions {
+            &PackOptions {
                 max_solutions: 16,
                 seeds: PACK_SEEDS,
                 allow_rotation: allow_rot,

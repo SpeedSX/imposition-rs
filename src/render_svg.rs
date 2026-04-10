@@ -36,6 +36,7 @@ fn escape_xml(s: &str) -> String {
 }
 
 /// SVG for a sheet layout (origin top-left, y down).
+#[must_use]
 pub fn render_layout_svg(
     sheet_w: i32,
     sheet_h: i32,
@@ -64,17 +65,12 @@ pub fn render_layout_svg(
     let mut parts: Vec<String> = Vec::new();
     parts.push("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".to_string());
     parts.push(format!(
-        "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{}\" height=\"{}\" viewBox=\"0 0 {} {}\">",
-        w, h, w, h
-    ));
+        "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{w}\" height=\"{h}\" viewBox=\"0 0 {w} {h}\">"));
     parts.push(format!(
-        "<rect x=\"0\" y=\"0\" width=\"{}\" height=\"{}\" fill=\"#f8f9fa\"/>",
-        w, h
-    ));
+        "<rect x=\"0\" y=\"0\" width=\"{w}\" height=\"{h}\" fill=\"#f8f9fa\"/>"));
     if !title.is_empty() {
         parts.push(format!(
-            "<text x=\"{}\" y=\"16\" font-size=\"12\" font-family=\"system-ui,sans-serif\">{}</text>",
-            pad,
+            "<text x=\"{pad}\" y=\"16\" font-size=\"12\" font-family=\"system-ui,sans-serif\">{}</text>",
             escape_xml(title)
         ));
     }
@@ -85,9 +81,7 @@ pub fn render_layout_svg(
     ));
 
     parts.push(format!(
-        "<rect x=\"0\" y=\"0\" width=\"{}\" height=\"{}\" fill=\"white\" stroke=\"#333\" stroke-width=\"{}\"/>",
-        sheet_w, sheet_h, sw
-    ));
+        "<rect x=\"0\" y=\"0\" width=\"{sheet_w}\" height=\"{sheet_h}\" fill=\"white\" stroke=\"#333\" stroke-width=\"{sw}\"/>"));
 
     for r in rects {
         let idx = *id_to_index.get(r.product_id.as_str()).unwrap_or(&0);

@@ -208,7 +208,7 @@ pub fn solve_layout_json(input: &str) -> Result<String, JsValue> {
         req.sheet_w,
         req.sheet_h,
         &products,
-        SolveOptions {
+        &SolveOptions {
             k_max: req.k_max,
             allow_rotation: default_allow,
         },
