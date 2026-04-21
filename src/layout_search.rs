@@ -1,12 +1,12 @@
 //! Port of `Layout/src/layoutSearch.ts` — enumerate count plans + pack.
 
 use crate::guillotine::{
-    expand_instances, pack_multi_stage, trivial_area_feasible, OrderSeed, PackInstance, PackOptions,
-    PackResult, SkuRow,
+    OrderSeed, PackInstance, PackOptions, PackResult, SkuRow, expand_instances, pack_multi_stage,
+    trivial_area_feasible,
 };
 use crate::proportion::{
-    compute_proportion_pattern, enumerate_count_plans, suggest_k_max_area, total_overproduction,
-    ProportionPattern,
+    ProportionPattern, compute_proportion_pattern, enumerate_count_plans, suggest_k_max_area,
+    total_overproduction,
 };
 
 const PACK_SEEDS: &[OrderSeed] = &[
@@ -82,7 +82,10 @@ pub fn solve_layout(
     }
     let targets = targets_from_products(products);
     let pattern = compute_proportion_pattern(&targets).ok()?;
-    let dims: Vec<(f64, f64)> = products.iter().map(|p| (f64::from(p.w), f64::from(p.h))).collect();
+    let dims: Vec<(f64, f64)> = products
+        .iter()
+        .map(|p| (f64::from(p.w), f64::from(p.h)))
+        .collect();
     let area_cap = suggest_k_max_area(&pattern, f64::from(sheet_w), f64::from(sheet_h), &dims);
     let k_cap = options.k_max.unwrap_or(500);
     let k_max = k_cap.min(area_cap.max(1) + 100).clamp(1, 2000);
@@ -139,7 +142,10 @@ pub fn solve_layout(
     }
 
     let min_pages = feasible.iter().map(|s| s.pages).min()?;
-    let mut tier: Vec<LayoutSolution> = feasible.into_iter().filter(|s| s.pages == min_pages).collect();
+    let mut tier: Vec<LayoutSolution> = feasible
+        .into_iter()
+        .filter(|s| s.pages == min_pages)
+        .collect();
     tier.sort_by(|a, b| {
         b.utilization
             .partial_cmp(&a.utilization)

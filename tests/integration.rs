@@ -1,6 +1,6 @@
 use layout_rs::{
-    compute_proportion_pattern, expand_instances, pack_multi_stage, pages_for_k, solve_layout,
-    verify_two_stage, PackOptions, ProductSpec, SolveOptions,
+    PackOptions, ProductSpec, SolveOptions, compute_proportion_pattern, expand_instances,
+    pack_multi_stage, pages_for_k, solve_layout, verify_two_stage,
 };
 
 #[test]

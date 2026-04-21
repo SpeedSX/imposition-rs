@@ -12,13 +12,13 @@ pub use wasm_api::solve_layout_json;
 
 // Native / test-only re-exports (not wasm-bindgen types).
 pub use guillotine::{
-    expand_instances, pack_multi_stage, total_placed_area, trivial_area_feasible, verify_two_stage,
-    verify_two_stage_hv, verify_two_stage_vh, OrderSeed, PackInstance, PackOptions, PackResult,
-    PlacedRect, SkuRow,
+    OrderSeed, PackInstance, PackOptions, PackResult, PlacedRect, SkuRow, expand_instances,
+    pack_multi_stage, total_placed_area, trivial_area_feasible, verify_two_stage,
+    verify_two_stage_hv, verify_two_stage_vh,
 };
-pub use layout_search::{solve_layout, LayoutSolution, ProductSpec, SolveOptions};
+pub use layout_search::{LayoutSolution, ProductSpec, SolveOptions, solve_layout};
 pub use proportion::{
-    compute_proportion_pattern, counts_for_k, enumerate_count_plans, gcd, gcd_many, pages_for_k,
-    suggest_k_max_area, total_overproduction, CountPlan, ProportionPattern,
+    CountPlan, ProportionPattern, compute_proportion_pattern, counts_for_k, enumerate_count_plans,
+    gcd, gcd_many, pages_for_k, suggest_k_max_area, total_overproduction,
 };
-pub use render_svg::{render_layout_svg, SvgOptions};
+pub use render_svg::{SvgOptions, render_layout_svg};

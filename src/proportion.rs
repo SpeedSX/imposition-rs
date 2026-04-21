@@ -84,7 +84,11 @@ fn ceil_div_pos(numer: i32, denom: i32) -> i32 {
 /// P(k) = `max_i` ceil(`T_i` / (`k` * `p_i`))
 /// # Errors
 /// - `ProportionError::InvalidK` if k < 1.
-pub fn pages_for_k(targets: &[i32], pattern: &ProportionPattern, k: i32) -> Result<i32, ProportionError> {
+pub fn pages_for_k(
+    targets: &[i32],
+    pattern: &ProportionPattern,
+    k: i32,
+) -> Result<i32, ProportionError> {
     let c = counts_for_k(pattern, k)?;
     let mut max_p = 0;
     for i in 0..targets.len() {
@@ -134,7 +138,11 @@ fn infer_gcd_k(counts: &[i32], pattern: &ProportionPattern) -> Option<i32> {
 
 /// All distinct per-sheet count vectors to try (gcd-scaled primitive ratios plus ceil families).
 #[must_use]
-pub fn enumerate_count_plans(targets: &[i32], pattern: &ProportionPattern, k_max: i32) -> Vec<CountPlan> {
+pub fn enumerate_count_plans(
+    targets: &[i32],
+    pattern: &ProportionPattern,
+    k_max: i32,
+) -> Vec<CountPlan> {
     use std::collections::HashMap;
 
     let mut map: HashMap<String, CountPlan> = HashMap::new();
@@ -149,7 +157,11 @@ pub fn enumerate_count_plans(targets: &[i32], pattern: &ProportionPattern, k_max
             .map(|(&t, &c)| ceil_div_pos(t, c))
             .max()
             .unwrap_or(0);
-        let key = counts.iter().map(std::string::ToString::to_string).collect::<Vec<_>>().join(",");
+        let key = counts
+            .iter()
+            .map(std::string::ToString::to_string)
+            .collect::<Vec<_>>()
+            .join(",");
         let merged_gcd_k = match map.get(&key) {
             Some(prev) => gcd_k.or(prev.gcd_k),
             None => gcd_k,

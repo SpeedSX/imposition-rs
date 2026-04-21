@@ -73,9 +73,9 @@ fn rects_overlap(a: &PlacedRect, b: &PlacedRect) -> bool {
 }
 
 fn all_inside_sheet(rects: &[PlacedRect], wp: i32, hp: i32) -> bool {
-    rects.iter().all(|r| {
-        r.x >= 0 && r.y >= 0 && r.x + r.w <= wp && r.y + r.h <= hp
-    })
+    rects
+        .iter()
+        .all(|r| r.x >= 0 && r.y >= 0 && r.x + r.w <= wp && r.y + r.h <= hp)
 }
 
 fn no_overlaps(rects: &[PlacedRect]) -> bool {
@@ -90,7 +90,7 @@ fn no_overlaps(rects: &[PlacedRect]) -> bool {
 }
 
 /// V–H: columns tile [0,Wp]; within each column, rects share (x,w) and stack from y=0.
-#[must_use] 
+#[must_use]
 pub fn verify_two_stage_vh(rects: &[PlacedRect], wp: i32, hp: i32) -> bool {
     if rects.is_empty() {
         return true;
@@ -148,7 +148,7 @@ pub fn verify_two_stage_vh(rects: &[PlacedRect], wp: i32, hp: i32) -> bool {
 }
 
 /// H–V: rows tile [0,Hp]; within each row, rects share (y,h) and pack from x=0.
-#[must_use] 
+#[must_use]
 pub fn verify_two_stage_hv(rects: &[PlacedRect], wp: i32, hp: i32) -> bool {
     if rects.is_empty() {
         return true;
@@ -644,7 +644,10 @@ pub fn pack_multi_stage(
     let mut seen = std::collections::HashSet::<String>::new();
     let mut results: Vec<PackResult> = Vec::new();
 
-    let try_push = |rects: Vec<PlacedRect>, mode: PackMode, results: &mut Vec<PackResult>, seen: &mut std::collections::HashSet<String>| {
+    let try_push = |rects: Vec<PlacedRect>,
+                    mode: PackMode,
+                    results: &mut Vec<PackResult>,
+                    seen: &mut std::collections::HashSet<String>| {
         let sig = signature(&rects);
         if !seen.insert(sig) {
             return;
@@ -667,10 +670,12 @@ pub fn pack_multi_stage(
             pack_vh_greedy(&ordered, wp, hp, default_allow_rotation)
         };
 
-        if let Some(ref rects) = vh 
-            && all_inside_sheet(rects, wp, hp) && no_overlaps(rects) {
-                try_push(rects.clone(), PackMode::Vh, &mut results, &mut seen);
-            }
+        if let Some(ref rects) = vh
+            && all_inside_sheet(rects, wp, hp)
+            && no_overlaps(rects)
+        {
+            try_push(rects.clone(), PackMode::Vh, &mut results, &mut seen);
+        }
 
         let ordered2 = sort_instances(instances, seed);
         let hv = if use_dfs {
@@ -679,10 +684,12 @@ pub fn pack_multi_stage(
             pack_hv_greedy(&ordered2, wp, hp, default_allow_rotation)
         };
 
-        if let Some(ref rects) = hv 
-            && all_inside_sheet(rects, wp, hp) && no_overlaps(rects) {
-                try_push(rects.clone(), PackMode::Hv, &mut results, &mut seen);
-            }
+        if let Some(ref rects) = hv
+            && all_inside_sheet(rects, wp, hp)
+            && no_overlaps(rects)
+        {
+            try_push(rects.clone(), PackMode::Hv, &mut results, &mut seen);
+        }
 
         if results.len() >= max_sol {
             return rank_pack_results(results);

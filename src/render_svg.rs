@@ -67,7 +67,8 @@ pub fn render_layout_svg(
     parts.push(format!(
         "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{w}\" height=\"{h}\" viewBox=\"0 0 {w} {h}\">"));
     parts.push(format!(
-        "<rect x=\"0\" y=\"0\" width=\"{w}\" height=\"{h}\" fill=\"#f8f9fa\"/>"));
+        "<rect x=\"0\" y=\"0\" width=\"{w}\" height=\"{h}\" fill=\"#f8f9fa\"/>"
+    ));
     if !title.is_empty() {
         parts.push(format!(
             "<text x=\"{pad}\" y=\"16\" font-size=\"12\" font-family=\"system-ui,sans-serif\">{}</text>",

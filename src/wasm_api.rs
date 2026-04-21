@@ -1,7 +1,7 @@
 //! Minimal WASM surface: JSON in → JSON out (layout + SVG).
 
-use crate::layout_search::{solve_layout, ProductSpec, SolveOptions};
-use crate::render_svg::{render_layout_svg, SvgOptions};
+use crate::layout_search::{ProductSpec, SolveOptions, solve_layout};
+use crate::render_svg::{SvgOptions, render_layout_svg};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -11,6 +11,9 @@ pub struct SolveLayoutRequest {
     pub sheet_w: i32,
     pub sheet_h: i32,
     pub products: Vec<ProductSpecWire>,
+    /// Upper bound on the integer scale **k** used to build proportional per-sheet
+    /// piece counts (`counts[i] = k * pattern[i]`). Omitted uses 500 in the solver,
+    /// combined with a sheet-area cap and an overall maximum of 2000.
     #[serde(default)]
     pub k_max: Option<i32>,
     #[serde(default)]
@@ -161,9 +164,8 @@ fn wire_response(
 /// Throws a JS `Error` on JSON parse failure or when no feasible layout exists.
 #[wasm_bindgen(js_name = solveLayoutJson)]
 pub fn solve_layout_json(input: &str) -> Result<String, JsValue> {
-    let req: SolveLayoutRequest = serde_json::from_str(input).map_err(|e| {
-        JsValue::from(js_sys::Error::new(&format!("Invalid JSON: {e}")))
-    })?;
+    let req: SolveLayoutRequest = serde_json::from_str(input)
+        .map_err(|e| JsValue::from(js_sys::Error::new(&format!("Invalid JSON: {e}"))))?;
 
     if req.sheet_w < 1 || req.sheet_h < 1 {
         return Err(JsValue::from(js_sys::Error::new(
@@ -227,7 +229,6 @@ pub fn solve_layout_json(input: &str) -> Result<String, JsValue> {
         default_allow,
         1.25,
     );
-    serde_json::to_string(&out).map_err(|e| {
-        JsValue::from(js_sys::Error::new(&format!("Serialize error: {e}")))
-    })
+    serde_json::to_string(&out)
+        .map_err(|e| JsValue::from(js_sys::Error::new(&format!("Serialize error: {e}"))))
 }
