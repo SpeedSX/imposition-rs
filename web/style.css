@@ -129,6 +129,20 @@ label.kmax {
   margin-top: 0.75rem;
 }
 
+.field-hint {
+  display: block;
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.45;
+  max-width: 100%;
+}
+
+.field-hint strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
 label.checkbox-row {
   flex-direction: row;
   align-items: center;

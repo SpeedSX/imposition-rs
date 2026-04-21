@@ -32,7 +32,22 @@
             </div>
             <label class="kmax">
               Max k (optional)
-              <input type="number" id="kMax" min="1" placeholder="default" />
+              <input
+                type="number"
+                id="kMax"
+                min="1"
+                placeholder="default"
+                title="Largest scale k tried when building proportional per-sheet piece counts. Empty uses default (500); also capped from sheet area (overall max 2000). Lower runs faster; higher searches more mixes."
+                aria-describedby="kMaxHint"
+              />
+              <span id="kMaxHint" class="field-hint">
+                The solver scales your targets’ proportion pattern by an integer
+                <strong>k</strong> to get candidate piece counts per sheet. This
+                field is the largest <strong>k</strong> it will try. Leave empty
+                for the default (500). Smaller values finish faster but may miss
+                a better layout; values are also limited by sheet size (up to
+                2000).
+              </span>
             </label>
             <label class="checkbox-row">
               <input type="checkbox" id="allowRotation" checked />
