@@ -1,7 +1,7 @@
 //! Minimal WASM surface: JSON in → JSON out (layout + SVG).
 
 use crate::layout_search::{ProductSpec, SolveOptions, solve_layout};
-use crate::render_svg::{SvgOptions, render_layout_svg};
+use crate::render_svg::{SheetLocale, SvgOptions, format_sheet_preview_title, render_layout_svg};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -18,6 +18,9 @@ pub struct SolveLayoutRequest {
     pub k_max: Option<i32>,
     #[serde(default)]
     pub allow_rotation: Option<bool>,
+    /// `"en"` (default) or `"ua"` / `"uk"` — affects the SVG sheet summary line only.
+    #[serde(default, alias = "lang", alias = "uiLang", alias = "uiLocale")]
+    pub locale: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -76,6 +79,7 @@ fn build_title(
     sol: &crate::layout_search::LayoutSolution,
     products: &[ProductSpecWire],
     default_allow_rot: bool,
+    locale: SheetLocale,
 ) -> String {
     let per_page: String = products
         .iter()
@@ -83,25 +87,16 @@ fn build_title(
         .map(|(i, p)| format!("{}×{}", p.id, sol.counts_per_page[i]))
         .collect::<Vec<_>>()
         .join(", ");
-    let k_label = if sol.k > 0 {
-        sol.k.to_string()
-    } else {
-        "— (mixed)".to_string()
-    };
-    let rot_note = format!(
-        "sheet default {}",
-        if default_allow_rot { "on" } else { "off" }
-    );
-    format!(
-        "Wp×Hp {}×{} · k={} · {} · P={} sheets · util {:.1}% · mode {} · {}",
+    format_sheet_preview_title(
         sheet_w,
         sheet_h,
-        k_label,
-        per_page,
+        sol.k,
+        &per_page,
         sol.pages,
-        sol.utilization * 100.0,
+        sol.utilization,
         sol.pack.mode.as_str(),
-        rot_note
+        default_allow_rot,
+        locale,
     )
 }
 
@@ -112,8 +107,9 @@ fn wire_response(
     products: &[ProductSpecWire],
     default_allow_rot: bool,
     stroke_width: f64,
+    locale: SheetLocale,
 ) -> SolveLayoutResponse {
-    let title = build_title(sheet_w, sheet_h, &sol, products, default_allow_rot);
+    let title = build_title(sheet_w, sheet_h, &sol, products, default_allow_rot, locale);
     let svg = render_layout_svg(
         sheet_w,
         sheet_h,
@@ -206,6 +202,11 @@ pub fn solve_layout_json(input: &str) -> Result<String, JsValue> {
         .collect();
 
     let default_allow = req.allow_rotation.unwrap_or(true);
+    let locale = req
+        .locale
+        .as_deref()
+        .map(SheetLocale::from_lang_code)
+        .unwrap_or_default();
     let sol = solve_layout(
         req.sheet_w,
         req.sheet_h,
@@ -228,7 +229,27 @@ pub fn solve_layout_json(input: &str) -> Result<String, JsValue> {
         &req.products,
         default_allow,
         1.25,
+        locale,
     );
     serde_json::to_string(&out)
         .map_err(|e| JsValue::from(js_sys::Error::new(&format!("Serialize error: {e}"))))
+}
+
+#[cfg(test)]
+mod request_tests {
+    use super::SolveLayoutRequest;
+
+    #[test]
+    fn json_locale_camelcase_parses() {
+        let j = r#"{"sheetW":1,"sheetH":1,"products":[{"id":"a","w":1,"h":1,"target":1}],"locale":"ua"}"#;
+        let r: SolveLayoutRequest = serde_json::from_str(j).expect("deserialize");
+        assert_eq!(r.locale.as_deref(), Some("ua"));
+    }
+
+    #[test]
+    fn json_lang_alias_parses() {
+        let j = r#"{"sheetW":1,"sheetH":1,"products":[{"id":"a","w":1,"h":1,"target":1}],"lang":"UA"}"#;
+        let r: SolveLayoutRequest = serde_json::from_str(j).expect("deserialize");
+        assert_eq!(r.locale.as_deref(), Some("UA"));
+    }
 }

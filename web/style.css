@@ -54,6 +54,25 @@ body {
   color: var(--accent);
 }
 
+.lang-row {
+  margin: 0.75rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.lang-label {
+  color: var(--muted);
+  margin-right: 0.25rem;
+}
+
+.btn-lang {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.82rem;
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(380px, min(32rem, 100%)) minmax(0, 1fr);

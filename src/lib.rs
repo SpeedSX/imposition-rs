@@ -21,4 +21,4 @@ pub use proportion::{
     CountPlan, ProportionPattern, compute_proportion_pattern, counts_for_k, enumerate_count_plans,
     gcd, gcd_many, pages_for_k, suggest_k_max_area, total_overproduction,
 };
-pub use render_svg::{SvgOptions, render_layout_svg};
+pub use render_svg::{SheetLocale, SvgOptions, format_sheet_preview_title, render_layout_svg};

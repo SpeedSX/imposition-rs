@@ -9,29 +9,34 @@
   <body>
     <div class="app">
       <header class="header">
-        <h1>Print sheet layout</h1>
-        <p class="tagline">
+        <h1 id="i18n-h1">Print sheet layout</h1>
+        <p id="i18n-tagline" class="tagline">
           Proportional counts per sheet, multi-stage guillotine (V–H / H–V). Optional 90° rotation per piece.
         </p>
-        <p class="engine-note">Engine: Rust → WebAssembly (<code>solveLayoutJson</code>).</p>
+        <p id="i18n-engine" class="engine-note">Engine: Rust → WebAssembly (<code>solveLayoutJson</code>).</p>
+        <p class="lang-row">
+          <span id="i18n-langLabel" class="lang-label"></span>
+          <button type="button" id="langEn" class="btn secondary btn-lang">English</button>
+          <button type="button" id="langUa" class="btn secondary btn-lang">Українська</button>
+        </p>
       </header>
 
       <div class="layout">
         <aside class="panel">
           <section class="card">
-            <h2>Sheet</h2>
+            <h2 id="i18n-sheetH2">Sheet</h2>
             <div class="grid2">
               <label>
-                Width Wp
+                <span id="i18n-lblSheetW">Width Wp</span>
                 <input type="number" id="sheetW" min="1" value="700" />
               </label>
               <label>
-                Height Hp
+                <span id="i18n-lblSheetH">Height Hp</span>
                 <input type="number" id="sheetH" min="1" value="600" />
               </label>
             </div>
             <label class="kmax">
-              Max k (optional)
+              <span id="i18n-lblKmax">Max k (optional)</span>
               <input
                 type="number"
                 id="kMax"
@@ -51,13 +56,15 @@
             </label>
             <label class="checkbox-row">
               <input type="checkbox" id="allowRotation" checked />
-              <span>Default: allow 90° rotation (for products set to “Sheet default”)</span>
+              <span id="i18n-lblRotationSheet"
+                >Default: allow 90° rotation (for products set to “Sheet default”)</span
+              >
             </label>
           </section>
 
           <section class="card">
             <div class="card-head">
-              <h2>Products</h2>
+              <h2 id="i18n-productsH2">Products</h2>
               <button type="button" id="addProduct" class="btn secondary">+ Add</button>
             </div>
             <div id="productList" class="product-list"></div>
@@ -69,11 +76,11 @@
 
         <main class="preview">
           <section class="card stats-card" id="statsSection" hidden>
-            <h2>Result</h2>
+            <h2 id="i18n-resultH2">Result</h2>
             <dl class="stats" id="stats"></dl>
           </section>
           <section class="card svg-card">
-            <h2>One sheet preview</h2>
+            <h2 id="i18n-previewH2">One sheet preview</h2>
             <div id="svgHost" class="svg-host">
               <p class="placeholder" id="placeholder">
                 Set sheet size and products, then click <strong>Compute layout</strong>.
