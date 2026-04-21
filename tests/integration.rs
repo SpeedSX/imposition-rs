@@ -30,7 +30,7 @@ fn i1_motivating_minimal_p() {
         w,
         h,
         &products,
-        SolveOptions {
+        &SolveOptions {
             k_max: Some(k_max),
             allow_rotation: true,
         },
@@ -74,7 +74,7 @@ fn i2_fallback_lower_k() {
         80,
         80,
         &products,
-        SolveOptions {
+        &SolveOptions {
             k_max: Some(100),
             allow_rotation: true,
         },
@@ -94,7 +94,7 @@ fn g2_01_trivial_pack() {
         count: 1,
         allow_rotation: None,
     }]);
-    let packs = pack_multi_stage(100, 100, &inst, PackOptions::default());
+    let packs = pack_multi_stage(100, 100, &inst, &PackOptions::default());
     assert!(!packs.is_empty());
     let r = &packs[0].rects;
     assert_eq!(layout_rs::total_placed_area(r), 2500);
@@ -110,7 +110,7 @@ fn g2_03_rotation_required() {
         count: 1,
         allow_rotation: None,
     }]);
-    let packs = pack_multi_stage(30, 40, &inst, PackOptions::default());
+    let packs = pack_multi_stage(30, 40, &inst, &PackOptions::default());
     assert!(!packs.is_empty());
     let pr = &packs[0].rects[0];
     assert!(pr.rotated);
