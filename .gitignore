@@ -4,3 +4,4 @@ dist
 dist-web
 node_modules
 *.wasm
+.vercel

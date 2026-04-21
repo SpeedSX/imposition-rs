@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "wasm:build": "powershell -NoProfile -ExecutionPolicy Bypass -File ./build-wasm.ps1",
+    "wasm:build:ci": "bash scripts/build-wasm-ci.sh",
     "dev": "vite",
     "build": "vite build",
+    "vercel-build": "npm run wasm:build:ci && vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
