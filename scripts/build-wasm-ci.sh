@@ -14,7 +14,7 @@ fi
 
 rustup target add wasm32-unknown-unknown
 
-WBG_VERSION="0.2.118"
+WBG_VERSION="0.2.120"
 if ! command -v wasm-bindgen >/dev/null 2>&1; then
   cargo install wasm-bindgen-cli --version "$WBG_VERSION" --locked --no-default-features
 fi
